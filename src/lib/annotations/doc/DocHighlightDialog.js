@@ -18,7 +18,8 @@ const HIGHLIGHT_DIALOG_HEIGHT = 38;
 const PAGE_PADDING_BOTTOM = 15;
 const PAGE_PADDING_TOP = 15;
 
-@autobind class DocHighlightDialog extends AnnotationDialog {
+@autobind
+class DocHighlightDialog extends AnnotationDialog {
     //--------------------------------------------------------------------------
     // Public
     //--------------------------------------------------------------------------
@@ -59,13 +60,10 @@ const PAGE_PADDING_TOP = 15;
     }
 
     /** @inheritdoc */
-    // hideMobileDialog() {
-    //     super.hideMobileDialog();
-
-    //     if (this.hasComments && this.element && this.highlightDialogEl) {
-    //         // this.hasComments = false;
-    //     }
-    // }
+    hideMobileDialog() {
+        super.hideMobileDialog();
+        this.toggleMobileHighlightDialogs();
+    }
 
     /**
      * Emit the message to create a highlight and render it.
@@ -172,6 +170,23 @@ const PAGE_PADDING_TOP = 15;
         // Reposition dialog
         if (!this.isMobile) {
             this.position();
+        }
+    }
+
+    toggleMobileHighlightDialogs() {
+        if (!this.commentsDialogEl || !this.highlightDialogEl) {
+            return;
+        }
+
+        const commentsDialogIsHidden = this.commentsDialogEl.classList.contains(CLASS_HIDDEN);
+
+        // Displays comments dialog and hides highlight annotations button
+        if (!commentsDialogIsHidden) {
+            annotatorUtil.hideElement(this.commentsDialogEl);
+
+            this.element.classList.add(CLASS_ANNOTATION_HIGHLIGHT_DIALOG);
+            annotatorUtil.showElement(this.highlightDialogEl);
+            this.hasComments = false;
         }
     }
 
