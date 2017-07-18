@@ -1,12 +1,13 @@
 $tablet: "(min-width: 768px)";
 $three-c: #ccc;
+
 @mixin border-top-bottom {
     border-color: $three-c;
     border-style: solid;
     border-width: 1px 0;
 }
 
-.bp-mobile-annotation-dialog{
+.bp-mobile-annotation-dialog {
     background: white;
     border-top: 0;
     height: 100%;
@@ -95,6 +96,7 @@ $three-c: #ccc;
         height: 48px;
         justify-content: space-between;
         padding: 0;
+
         @include border-top-bottom;
     }
 
@@ -168,6 +170,7 @@ $three-c: #ccc;
 .bp-mobile-annotation-dialog.bp-plain-highlight {
     height: 47px; // includes mobile header & highlight dialog
     top: auto;
+
     @include border-top-bottom;
 }
 
@@ -177,9 +180,10 @@ $three-c: #ccc;
     position: fixed;
     width: 100%;
     padding: 15px;
+    background: white;
     bottom: 0;
     left: 0;
-    background: white;
+
     @include border-top-bottom;
 }
 
@@ -195,11 +199,11 @@ $three-c: #ccc;
     z-index: 9999;
 
     .bp-annotation-highlight-btns button {
-        width: 50%;
         float: left;
+        width: 50%;
 
         &:first-child {
-             border-right: 1px solid $three-c;
+            border-right: 1px solid $three-c;
         }
     }
 
