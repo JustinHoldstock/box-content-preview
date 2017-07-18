@@ -35,12 +35,17 @@ class DocHighlightThread extends AnnotationThread {
      */
     cancelFirstComment() {
         if (annotatorUtil.isPlainHighlight(this.annotations)) {
-            this.dialog.toggleHighlightDialogs();
-            this.reset();
+            if (this.isMobile) {
+                this.dialog.toggleMobileHighlightDialogs();
+                this.state = STATES.inactive;
+            } else {
+                this.dialog.toggleHighlightDialogs();
+                this.reset();
+            }
 
             // Reset type from highlight-comment to highlight
             this.type = TYPES.highlight;
-        } else {
+        } else if (!this.isMobile) {
             this.destroy();
         }
     }

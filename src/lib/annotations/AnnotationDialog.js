@@ -172,9 +172,7 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
         this.unbindDOMListeners();
 
         // Cancel any unsaved annotations
-        if (!this.hasAnnotations) {
-            this.cancelAnnotation();
-        }
+        this.cancelAnnotation();
     }
 
     /**
@@ -183,6 +181,10 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
      * @return {void}
      */
     hide() {
+        if (this.element && this.element.classList.contains(CLASS_HIDDEN)) {
+            return;
+        }
+
         if (this.isMobile) {
             this.hideMobileDialog();
         }

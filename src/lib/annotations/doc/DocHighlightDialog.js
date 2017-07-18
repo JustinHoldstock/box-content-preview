@@ -62,7 +62,6 @@ class DocHighlightDialog extends AnnotationDialog {
     /** @inheritdoc */
     hideMobileDialog() {
         super.hideMobileDialog();
-        this.toggleMobileHighlightDialogs();
     }
 
     /**
