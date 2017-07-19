@@ -179,12 +179,12 @@ $three-c: #ccc;
 .bp-mobile-annotation-dialog .bp-annotation-highlight-btns,
 .bp-mobile-annotation-dialog .bp-create-highlight-comment,
 .bp-mobile-annotation-dialog .annotation-container section[data-section="create"] {
-    position: fixed;
     background: white;
-    padding: 15px;
-    width: 100%;
     bottom: 0;
     left: 0;
+    padding: 15px;
+    position: fixed;
+    width: 100%;
 
     @include border-top-bottom;
 }

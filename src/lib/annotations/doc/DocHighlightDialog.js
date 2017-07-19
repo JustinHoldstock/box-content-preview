@@ -51,6 +51,7 @@ class DocHighlightDialog extends AnnotationDialog {
         super.addAnnotation(annotation);
     }
 
+    /** @inheritdoc */
     postAnnotation(textInput) {
         const annotationTextEl = this.element.querySelector(constants.SELECTOR_ANNOTATION_TEXTAREA);
         const text = textInput || annotationTextEl.value;
@@ -65,6 +66,29 @@ class DocHighlightDialog extends AnnotationDialog {
         }
 
         super.postAnnotation(textInput);
+    }
+
+    /**
+     * Set the state of the dialog so comments are hidden, if they're currently shown.
+     * 
+     * @public
+     * @return {void}
+     */
+    hideCommentsDialog() {
+        if (!this.commentsDialogEl || !this.highlightDialogEl) {
+            return;
+        }
+
+        const commentsDialogIsHidden = this.commentsDialogEl.classList.contains(CLASS_HIDDEN);
+
+        // Displays comments dialog and hides highlight annotations button
+        if (!commentsDialogIsHidden) {
+            annotatorUtil.hideElement(this.commentsDialogEl);
+
+            this.element.classList.add(CLASS_HIGHLIGHT_DIALOG);
+            annotatorUtil.showElement(this.highlightDialogEl);
+            this.hasComments = false;
+        }
     }
 
     /**
@@ -137,6 +161,7 @@ class DocHighlightDialog extends AnnotationDialog {
      * highlight comments dialog. Dialogs are toggled based on whether the
      * highlight annotation has text comments or not.
      *
+     * @override
      * @return {void}
      */
     toggleHighlightDialogs() {
@@ -154,7 +179,6 @@ class DocHighlightDialog extends AnnotationDialog {
             this.element.classList.add(constants.CLASS_ANNOTATION_DIALOG);
             annotatorUtil.showElement(this.commentsDialogEl);
             this.hasComments = true;
-            console.log('toggleHighlightDialogs has comments -> true');
             // Activate comments textarea
             const textAreaEl = this.dialogEl.querySelector(constants.SELECTOR_ANNOTATION_TEXTAREA);
             textAreaEl.classList.add(CLASS_ACTIVE);
@@ -167,31 +191,11 @@ class DocHighlightDialog extends AnnotationDialog {
             this.element.classList.add(CLASS_HIGHLIGHT_DIALOG);
             annotatorUtil.showElement(this.highlightDialogEl);
             this.hasComments = false;
-            console.log('toggleHighlightDialogs has comments -> false');
         }
 
         // Reposition dialog
         if (!this.isMobile) {
             this.position();
-        }
-    }
-
-    toggleMobileHighlightDialogs() {
-        if (!this.commentsDialogEl || !this.highlightDialogEl) {
-            return;
-        }
-
-        const commentsDialogIsHidden = this.commentsDialogEl.classList.contains(CLASS_HIDDEN);
-
-        // Displays comments dialog and hides highlight annotations button
-        if (!commentsDialogIsHidden) {
-            annotatorUtil.hideElement(this.commentsDialogEl);
-
-            this.element.classList.add(CLASS_HIGHLIGHT_DIALOG);
-            annotatorUtil.showElement(this.highlightDialogEl);
-            this.hasComments = false;
-
-            console.log('toggleMobileHighlightDialogs hasComments   --> false');
         }
     }
 

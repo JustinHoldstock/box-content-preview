@@ -36,7 +36,7 @@ class DocHighlightThread extends AnnotationThread {
     cancelFirstComment() {
         if (annotatorUtil.isPlainHighlight(this.annotations)) {
             if (this.isMobile) {
-                this.dialog.toggleMobileHighlightDialogs();
+                this.dialog.hideCommentsDialog();
                 this.state = STATES.inactive;
             } else {
                 this.dialog.toggleHighlightDialogs();
