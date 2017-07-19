@@ -5,7 +5,6 @@ import * as annotatorUtil from '../annotatorUtil';
 import * as constants from '../annotationConstants';
 import { CLASS_ACTIVE, CLASS_HIDDEN } from '../../constants';
 
-const CLASS_ANNOTATION_PLAIN_HIGHLIGHT = 'bp-plain-highlight';
 const CLASS_CANCEL_DELETE = 'cancel-delete-btn';
 const CLASS_CANNOT_ANNOTATE = 'cannot-annotate';
 const CLASS_REPLY_TEXTAREA = 'reply-textarea';
@@ -174,7 +173,7 @@ describe('lib/annotations/AnnotationDialog', () => {
             stubs.bind = sandbox.stub(dialog, 'bindDOMListeners');
 
             dialog.show();
-            expect(dialog.element).to.have.class(CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
+            expect(dialog.element).to.have.class(constants.CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
         });
     });
 

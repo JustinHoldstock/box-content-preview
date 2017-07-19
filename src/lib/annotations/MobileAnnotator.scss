@@ -16,6 +16,8 @@ $three-c: #ccc;
     width: 100%;
 
     &.bp-animate-show-dialog {
+        // padding: 0;
+
         &:not(.bp-plain-highlight) {
             animation: show-dialog-small;
             animation-duration: .2s;
@@ -178,9 +180,9 @@ $three-c: #ccc;
 .bp-mobile-annotation-dialog .bp-create-highlight-comment,
 .bp-mobile-annotation-dialog .annotation-container section[data-section="create"] {
     position: fixed;
-    width: 100%;
-    padding: 15px;
     background: white;
+    padding: 15px;
+    width: 100%;
     bottom: 0;
     left: 0;
 

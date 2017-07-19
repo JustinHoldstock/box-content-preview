@@ -201,7 +201,7 @@ class DocHighlightThread extends AnnotationThread {
         // If mouse is in dialog, change state to hover or active-hover
         if (docAnnotatorUtil.isInDialog(event, this.dialog.element)) {
             // Keeps dialog open if comment is pending
-            if (this.state === STATES.pending_ACTIVE) {
+            if (this.state === STATES.pending_active) {
                 return false;
             }
             this.state = STATES.hover;
@@ -251,7 +251,7 @@ class DocHighlightThread extends AnnotationThread {
                 this.draw(HIGHLIGHT_FILL.normal);
                 break;
             case STATES.hover:
-            case STATES.pending_ACTIVE:
+            case STATES.pending_active:
                 this.showDialog();
                 this.draw(HIGHLIGHT_FILL.active);
                 break;
@@ -309,14 +309,14 @@ class DocHighlightThread extends AnnotationThread {
     bindCustomListenersOnDialog() {
         // Annotation drawn
         this.dialog.addListener('annotationdraw', () => {
-            this.state = STATES.pending_ACTIVE;
+            this.state = STATES.pending_active;
             window.getSelection().removeAllRanges();
             this.show();
         });
 
         // Annotation drawn
         this.dialog.addListener('annotationcommentpending', () => {
-            this.state = STATES.pending_ACTIVE;
+            this.state = STATES.pending_active;
         });
 
         // Annotation created

@@ -6,7 +6,6 @@ import { CLASS_ACTIVE, CLASS_HIDDEN } from '../constants';
 import { decodeKeydown } from '../util';
 import { ICON_CLOSE, ICON_DELETE } from '../icons/icons';
 
-const CLASS_ANNOTATION_PLAIN_HIGHLIGHT = 'bp-plain-highlight';
 const CLASS_BUTTON_DELETE_COMMENT = 'delete-comment-btn';
 const CLASS_CANCEL_DELETE = 'cancel-delete-btn';
 const CLASS_CANNOT_ANNOTATE = 'cannot-annotate';
@@ -25,7 +24,8 @@ const DATA_TYPE_DELETE = 'delete-btn';
 const DATA_TYPE_CANCEL_DELETE = 'cancel-delete-btn';
 const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
 
-@autobind class AnnotationDialog extends EventEmitter {
+@autobind
+class AnnotationDialog extends EventEmitter {
     //--------------------------------------------------------------------------
     // Typedef
     //--------------------------------------------------------------------------
@@ -91,8 +91,8 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
             annotatorUtil.showElement(this.element);
             this.element.appendChild(this.dialogEl);
 
-            if (this.highlightDialogEl && !this.hasComments) {
-                this.element.classList.add(CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
+            if (this.highlightDialogEl && !this.element.querySelectorAll('.annotation-comment').length) {
+                this.element.classList.add(constants.CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
 
                 const headerEl = this.element.querySelector(constants.SELECTOR_MOBILE_DIALOG_HEADER);
                 headerEl.classList.add(CLASS_HIDDEN);
@@ -163,7 +163,7 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
             <div class="${constants.CLASS_MOBILE_DIALOG_HEADER}">
                 <button class="${constants.CLASS_DIALOG_CLOSE}">${ICON_CLOSE}</button>
             </div>`.trim();
-        this.element.classList.remove(CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
+        this.element.classList.remove(constants.CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
 
         const dialogCloseButtonEl = this.element.querySelector(constants.SELECTOR_DIALOG_CLOSE);
         dialogCloseButtonEl.removeEventListener('click', this.hideMobileDialog);
@@ -498,7 +498,9 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
                 <div class="comment-date">${created}</div>
             </div>
             <div class="comment-text">${text}</div>
-            <button class="bp-btn-plain ${CLASS_BUTTON_DELETE_COMMENT} ${annotation.permissions.can_delete ? '' : CLASS_HIDDEN}" data-type="${DATA_TYPE_DELETE}" title="${__('annotation_delete')}">
+            <button class="bp-btn-plain ${CLASS_BUTTON_DELETE_COMMENT} ${annotation.permissions.can_delete
+            ? ''
+            : CLASS_HIDDEN}" data-type="${DATA_TYPE_DELETE}" title="${__('annotation_delete')}">
                 ${ICON_DELETE}
             </button>
             <div class="${CLASS_DELETE_CONFIRMATION} ${CLASS_HIDDEN}">
@@ -676,7 +678,9 @@ const DATA_TYPE_CONFIRM_DELETE = 'confirm-delete-btn';
                 <div class="${CLASS_COMMENTS_CONTAINER}"></div>
                 <div class="${CLASS_REPLY_CONTAINER}">
                     <textarea class="${constants.CLASS_TEXTAREA} ${CLASS_REPLY_TEXTAREA}"
-                        placeholder="${__('annotation_reply_placeholder')}" data-type="${DATA_TYPE_REPLY_TEXTAREA}"></textarea>
+                        placeholder="${__(
+                            'annotation_reply_placeholder'
+                        )}" data-type="${DATA_TYPE_REPLY_TEXTAREA}"></textarea>
                     <div class="${constants.CLASS_BUTTON_CONTAINER} ${CLASS_HIDDEN}">
                         <button class="bp-btn ${constants.CLASS_ANNOTATION_BUTTON_CANCEL}" data-type="${DATA_TYPE_CANCEL_REPLY}">
                             ${__('annotation_cancel')}

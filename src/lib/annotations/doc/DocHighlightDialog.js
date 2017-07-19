@@ -8,7 +8,6 @@ import { ICON_HIGHLIGHT, ICON_HIGHLIGHT_COMMENT } from '../../icons/icons';
 import * as constants from '../annotationConstants';
 
 const CLASS_HIGHLIGHT_DIALOG = 'bp-highlight-dialog';
-const CLASS_ANNOTATION_HIGHLIGHT_DIALOG = 'bp-annotation-highlight-dialog';
 const CLASS_TEXT_HIGHLIGHTED = 'bp-is-text-highlighted';
 const CLASS_HIGHLIGHT_LABEL = 'bp-annotation-highlight-label';
 const DATA_TYPE_HIGHLIGHT = 'highlight-btn';
@@ -47,21 +46,25 @@ class DocHighlightDialog extends AnnotationDialog {
             if (!this.isMobile) {
                 this.position();
             }
-        } else {
-            // Convert from plain highlight to comment
-            const headerEl = this.isMobile ? this.element.querySelector('.bp-annotation-mobile-header') : null;
-            if (headerEl) {
-                headerEl.classList.remove(CLASS_HIDDEN);
-                this.element.classList.remove('bp-plain-highlight');
-            }
         }
 
         super.addAnnotation(annotation);
     }
 
-    /** @inheritdoc */
-    hideMobileDialog() {
-        super.hideMobileDialog();
+    postAnnotation(textInput) {
+        const annotationTextEl = this.element.querySelector(constants.SELECTOR_ANNOTATION_TEXTAREA);
+        const text = textInput || annotationTextEl.value;
+        if (text.trim() === '') {
+            return;
+        }
+        // Convert from plain highlight to comment
+        const headerEl = this.isMobile ? this.element.querySelector('.bp-annotation-mobile-header') : null;
+        if (headerEl) {
+            headerEl.classList.remove(CLASS_HIDDEN);
+            this.element.classList.remove(constants.CLASS_ANNOTATION_PLAIN_HIGHLIGHT);
+        }
+
+        super.postAnnotation(textInput);
     }
 
     /**
@@ -151,7 +154,7 @@ class DocHighlightDialog extends AnnotationDialog {
             this.element.classList.add(constants.CLASS_ANNOTATION_DIALOG);
             annotatorUtil.showElement(this.commentsDialogEl);
             this.hasComments = true;
-
+            console.log('toggleHighlightDialogs has comments -> true');
             // Activate comments textarea
             const textAreaEl = this.dialogEl.querySelector(constants.SELECTOR_ANNOTATION_TEXTAREA);
             textAreaEl.classList.add(CLASS_ACTIVE);
@@ -164,6 +167,7 @@ class DocHighlightDialog extends AnnotationDialog {
             this.element.classList.add(CLASS_HIGHLIGHT_DIALOG);
             annotatorUtil.showElement(this.highlightDialogEl);
             this.hasComments = false;
+            console.log('toggleHighlightDialogs has comments -> false');
         }
 
         // Reposition dialog
@@ -183,9 +187,11 @@ class DocHighlightDialog extends AnnotationDialog {
         if (!commentsDialogIsHidden) {
             annotatorUtil.hideElement(this.commentsDialogEl);
 
-            this.element.classList.add(CLASS_ANNOTATION_HIGHLIGHT_DIALOG);
+            this.element.classList.add(CLASS_HIGHLIGHT_DIALOG);
             annotatorUtil.showElement(this.highlightDialogEl);
             this.hasComments = false;
+
+            console.log('toggleMobileHighlightDialogs hasComments   --> false');
         }
     }
 
@@ -243,7 +249,7 @@ class DocHighlightDialog extends AnnotationDialog {
 
         // Generate HTML of highlight dialog
         this.highlightDialogEl = this.generateHighlightDialogEl();
-        this.highlightDialogEl.classList.add(CLASS_ANNOTATION_HIGHLIGHT_DIALOG);
+        this.highlightDialogEl.classList.add(constants.CLASS_ANNOTATION_HIGHLIGHT_DIALOG);
 
         // Generate HTML of comments dialog
         this.commentsDialogEl = this.generateDialogEl(annotations.length);
