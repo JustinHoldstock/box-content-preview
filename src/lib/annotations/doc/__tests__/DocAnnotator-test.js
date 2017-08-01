@@ -138,19 +138,10 @@ describe('lib/annotations/doc/DocAnnotator', () => {
 
             it('should infer page from selection if it cannot be inferred from event', () => {
                 annotator.highlighter.highlights = [{}, {}];
-                stubs.getPageInfo.onFirstCall().returns({ pageEl: null, page: -1 });
-                stubs.getPageInfo.onSecondCall().returns({
-                    pageEl: {
-                        getBoundingClientRect: sandbox.stub().returns({
-                            width: 100,
-                            height: 100
-                        })
-                    },
-                    page: 2
-                });
+                stubs.getPageInfo.returns({ pageEl: null, page: -1 });
 
                 annotator.getLocationFromEvent({}, TYPES.highlight);
-                expect(stubs.getPageInfo).to.be.called.twice;
+                expect(stubs.getPageInfo).to.be.called;
             });
 
             it('should not return a valid highlight location if no highlights exist', () => {
@@ -178,27 +169,15 @@ describe('lib/annotations/doc/DocAnnotator', () => {
             });
 
             it('should not return a location if there is no selection present', () => {
-                annotator.highlighter.highlights = [];
-                const location = annotator.getLocationFromEvent({}, TYPES.highlight_comment);
-                expect(location).to.be.null;
+                expect(annotator.getLocationFromEvent({}, TYPES.highlight_comment)).to.be.null;
             });
 
             it('should infer page from selection if it cannot be inferred from event', () => {
-                annotator.highlighter.highlights = [{}];
-                const getPageStub = stubs.getPageInfo;
-                getPageStub.onFirstCall().returns({ pageEl: null, page: -1 });
-                getPageStub.onSecondCall().returns({
-                    pageEl: {
-                        getBoundingClientRect: sandbox.stub().returns({
-                            width: 100,
-                            height: 100
-                        })
-                    },
-                    page: 2
-                });
+                annotator.highlighter.highlights = [{}, {}];
+                stubs.getPageInfo.returns({ pageEl: null, page: -1 });
 
                 annotator.getLocationFromEvent({}, TYPES.highlight_comment);
-                expect(stubs.getSel).to.have.been.called;
+                expect(stubs.getPageInfo).to.be.called;
             });
 
             it('should not return a valid highlight location if no highlights exist', () => {
@@ -737,16 +716,30 @@ describe('lib/annotations/doc/DocAnnotator', () => {
             stubs.getPageInfo = stubs.getPageInfo.returns({ pageEl: {}, page: 1 });
             stubs.getThreads = sandbox.stub(annotator, 'getHighlightThreadsOnPage');
             stubs.clock = sinon.useFakeTimers();
+            stubs.isDialog = sandbox.stub(docAnnotatorUtil, 'isDialogDataType');
 
             let timer = 0;
             window.performance = window.performance || { now: () => {} };
             sandbox.stub(window.performance, 'now', () => {
                 return (timer += 500);
             });
+
+            annotator.isCreatingHighlight = false;
         });
 
         afterEach(() => {
             stubs.clock.restore();
+        });
+
+        it('should not do anything if user is creating a highlight', () => {
+            stubs.threadMock.expects('onMousemove').returns(false).never();
+            stubs.delayMock.expects('onMousemove').returns(true).never();
+            stubs.getThreads.returns([stubs.thread, stubs.delayThread]);
+            annotator.isCreatingHighlight = true;
+
+            annotator.mouseMoveEvent = { clientX: 3, clientY: 3 };
+            annotator.onHighlightCheck();
+            expect(stubs.isDialog).to.not.be.called;
         });
 
         it('should not add any delayThreads if there are no threads on the current page', () => {

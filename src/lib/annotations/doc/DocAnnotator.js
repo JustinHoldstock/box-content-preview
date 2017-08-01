@@ -227,7 +227,7 @@ class DocAnnotator extends Annotator {
 
             // Get correct page
             let { pageEl, page } = annotatorUtil.getPageInfo(window.getSelection().anchorNode);
-            if (page === -1) {
+            if (!pageEl) {
                 // The ( .. ) around assignment is required syntax
                 ({ pageEl, page } = annotatorUtil.getPageInfo(
                     this.annotatedElement.querySelector(`.${CLASS_RANGY_HIGHLIGHT}`)
@@ -305,7 +305,7 @@ class DocAnnotator extends Annotator {
         } else if (type === TYPES.point) {
             thread = new DocPointThread(threadParams);
         } else {
-            throw new Error(`DocAnnotator: Unknown Annotation Type: ${type}`);
+            throw new Error(`Unhandled document annotation type: ${type}`);
         }
 
         this.addThreadToMap(thread);
@@ -337,6 +337,7 @@ class DocAnnotator extends Annotator {
             return null;
         }
         this.createHighlightDialog.hide();
+        this.isCreatingHighlight = false;
 
         const location = this.getLocationFromEvent(this.lastHighlightEvent, TYPES.highlight);
         if (!location) {
@@ -593,7 +594,19 @@ class DocAnnotator extends Annotator {
             return;
         }
 
+        // Determine if user is in the middle of creating a highlight
+        // annotation and ignore hover events of any highlights below
+        if (this.isCreatingHighlight) {
+            return;
+        }
+
+        // Determine if mouse is over any highlight dialog
+        // and ignore hover events of any highlights below
         const event = this.mouseMoveEvent;
+        if (docAnnotatorUtil.isDialogDataType(event.target)) {
+            return;
+        }
+
         this.mouseMoveEvent = null;
         this.throttleTimer = performance.now();
         // Only filter through highlight threads on the current page
@@ -681,6 +694,8 @@ class DocAnnotator extends Annotator {
         }
 
         this.createHighlightDialog.hide();
+        this.isCreatingHighlight = false;
+
         // Creating highlights is disabled on mobile for now since the
         // event we would listen to, selectionchange, fires continuously and
         // is unreliable. If the mouse moved or we double clicked text,
@@ -690,8 +705,6 @@ class DocAnnotator extends Annotator {
         } else {
             this.highlightClickHandler(event);
         }
-
-        this.isCreatingHighlight = false;
     }
 
     /**
@@ -751,6 +764,7 @@ class DocAnnotator extends Annotator {
         if (!this.isMobile) {
             this.createHighlightDialog.setPosition(right - pageLeft, bottom - pageTop);
         }
+        this.isCreatingHighlight = true;
 
         this.lastHighlightEvent = event;
     }

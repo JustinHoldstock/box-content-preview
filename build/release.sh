@@ -14,7 +14,7 @@ patch_release=false
 
 
 reset_to_master() {
-    # Update to latest code on Github master
+    # Update to latest code on GitHub master
     git checkout master || return 1
 
     # Wipe tags
@@ -71,7 +71,7 @@ update_changelog() {
     echo "Updating CHANGELOG.md"
     echo "----------------------------------------------------------------------"
 
-    if github_changelog_generator box/box-content-preview --future-release v$VERSION --exclude-labels legacy-ignore; then
+    if ./node_modules/.bin/conventional-changelog -i CHANGELOG.md --same-file; then
         echo "----------------------------------------------------------------------"
         echo "Updated CHANGELOG successfully"
         echo "----------------------------------------------------------------------"
@@ -110,16 +110,29 @@ push_to_github() {
     echo "Master version is now at" $VERSION
     echo "----------------------------------------------------------------------"
 
-    # Push to Github including tags
-    if git push github-upstream master --tags --no-verify; then
-        echo "----------------------------------------------------------------------"
-        echo "Pushed version" $VERSION "to git successfully"
-        echo "----------------------------------------------------------------------"
+    # Push release to GitHub
+    if $patch_release; then
+        if git push github-upstream v$VERSION --no-verify; then
+            echo "----------------------------------------------------------------------"
+            echo "Pushed version" $VERSION "to git successfully"
+            echo "----------------------------------------------------------------------"
+        else
+            echo "----------------------------------------------------------------------"
+            echo "Error while pushing version" $VERSION "to git"
+            echo "----------------------------------------------------------------------"
+            return 1
+        fi
     else
-        echo "----------------------------------------------------------------------"
-        echo "Error while pushing version" $VERSION "to git"
-        echo "----------------------------------------------------------------------"
-        return 1
+        if git push github-upstream master --tags --no-verify; then
+            echo "----------------------------------------------------------------------"
+            echo "Pushed version" $VERSION "to git successfully"
+            echo "----------------------------------------------------------------------"
+        else
+            echo "----------------------------------------------------------------------"
+            echo "Error while pushing version" $VERSION "to git"
+            echo "----------------------------------------------------------------------"
+            return 1
+        fi
     fi
 }
 
@@ -156,8 +169,14 @@ push_new_release() {
     # Update readme
     update_readme || return 1
 
-    # Push to Github
+    # Push to GitHub
     push_to_github || return 1
+
+    # Push GitHub release
+    echo "----------------------------------------------------------------------"
+    echo "Pushing new GitHub release"
+    echo "----------------------------------------------------------------------"
+    ./node_modules/.bin/conventional-github-releaser
 }
 
 

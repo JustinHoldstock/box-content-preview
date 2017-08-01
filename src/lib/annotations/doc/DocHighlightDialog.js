@@ -3,15 +3,12 @@ import AnnotationDialog from '../AnnotationDialog';
 import * as annotatorUtil from '../annotatorUtil';
 import * as docAnnotatorUtil from './docAnnotatorUtil';
 import { CLASS_HIDDEN, CLASS_ACTIVE } from '../../constants';
-import { replacePlaceholders, decodeKeydown } from '../../util';
 import { ICON_HIGHLIGHT, ICON_HIGHLIGHT_COMMENT } from '../../icons/icons';
 import * as constants from '../annotationConstants';
 
 const CLASS_HIGHLIGHT_DIALOG = 'bp-highlight-dialog';
 const CLASS_TEXT_HIGHLIGHTED = 'bp-is-text-highlighted';
 const CLASS_HIGHLIGHT_LABEL = 'bp-annotation-highlight-label';
-const DATA_TYPE_HIGHLIGHT = 'highlight-btn';
-const DATA_TYPE_ADD_HIGHLIGHT_COMMENT = 'add-highlight-comment-btn';
 
 const HIGHLIGHT_DIALOG_HEIGHT = 38;
 const PAGE_PADDING_BOTTOM = 15;
@@ -37,7 +34,7 @@ class DocHighlightDialog extends AnnotationDialog {
         // Will be displayed as '{name} highlighted'
         if (annotation.text === '' && annotation.user.id !== '0') {
             const highlightLabelEl = this.highlightDialogEl.querySelector(`.${CLASS_HIGHLIGHT_LABEL}`);
-            highlightLabelEl.textContent = replacePlaceholders(__('annotation_who_highlighted'), [
+            highlightLabelEl.textContent = annotatorUtil.replacePlaceholders(__('annotation_who_highlighted'), [
                 annotation.user.name
             ]);
             annotatorUtil.showElement(highlightLabelEl);
@@ -293,7 +290,7 @@ class DocHighlightDialog extends AnnotationDialog {
         // be 'Some User'
         if (annotatorUtil.isPlainHighlight(annotations) && annotations[0].user.id !== '0') {
             const highlightLabelEl = this.highlightDialogEl.querySelector(`.${CLASS_HIGHLIGHT_LABEL}`);
-            highlightLabelEl.textContent = replacePlaceholders(__('annotation_who_highlighted'), [
+            highlightLabelEl.textContent = annotatorUtil.replacePlaceholders(__('annotation_who_highlighted'), [
                 annotations[0].user.name
             ]);
             annotatorUtil.showElement(highlightLabelEl);
@@ -360,7 +357,7 @@ class DocHighlightDialog extends AnnotationDialog {
      */
     keydownHandler(event) {
         event.stopPropagation();
-        if (decodeKeydown(event) === 'Enter') {
+        if (annotatorUtil.decodeKeydown(event) === 'Enter') {
             this.mousedownHandler(event);
         }
         super.keydownHandler(event);
@@ -379,11 +376,11 @@ class DocHighlightDialog extends AnnotationDialog {
 
         switch (dataType) {
             // Clicking 'Highlight' button to create or remove a highlight
-            case DATA_TYPE_HIGHLIGHT:
+            case constants.DATA_TYPE_HIGHLIGHT:
                 this.drawAnnotation();
                 break;
             // Clicking 'Highlight' button to create a highlight
-            case DATA_TYPE_ADD_HIGHLIGHT_COMMENT:
+            case constants.DATA_TYPE_ADD_HIGHLIGHT_COMMENT:
                 this.emit('annotationdraw');
                 this.toggleHighlightCommentsReply(false);
                 this.toggleHighlightDialogs();
@@ -530,12 +527,12 @@ class DocHighlightDialog extends AnnotationDialog {
             <span class="${CLASS_HIGHLIGHT_LABEL} ${CLASS_HIDDEN}"></span>
             <span class="${constants.CLASS_HIGHLIGHT_BTNS}">
                 <button class="bp-btn-plain ${constants.CLASS_ADD_HIGHLIGHT_BTN}"
-                    data-type="${DATA_TYPE_HIGHLIGHT}"
+                    data-type="${constants.DATA_TYPE_HIGHLIGHT}"
                     title="${__('annotation_highlight_toggle')}">
                     ${ICON_HIGHLIGHT}
                 </button>
                 <button class="bp-btn-plain ${constants.CLASS_ADD_HIGHLIGHT_COMMENT_BTN}"
-                    data-type="${DATA_TYPE_ADD_HIGHLIGHT_COMMENT}"
+                    data-type="${constants.DATA_TYPE_ADD_HIGHLIGHT_COMMENT}"
                     title="${__('annotation_highlight_comment')}">
                     ${ICON_HIGHLIGHT_COMMENT}
                 </button>

@@ -12,13 +12,16 @@ import {
     getLowerRightCornerOfLastQuadPoint,
     isValidSelection,
     getContext,
-    getPageEl
+    getPageEl,
+    isDialogDataType
 } from '../docAnnotatorUtil';
 import {
     SELECTOR_ANNOTATION_DIALOG,
     SELECTOR_ANNOTATION_CONTAINER,
-    CLASS_ANNOTATION_DIALOG
+    CLASS_ANNOTATION_DIALOG,
+    DATA_TYPE_ANNOTATION_DIALOG
 } from '../../annotationConstants';
+import * as annotatorUtil from '../../annotatorUtil';
 
 const sandbox = sinon.sandbox.create();
 
@@ -275,6 +278,18 @@ describe('lib/annotations/doc/docAnnotatorUtil', () => {
 
             const pageEl = getPageEl(docEl, page);
             assert.equal(pageEl, truePageEl);
+        });
+    });
+
+    describe('isDialogDataType()', () => {
+        it('should return true if the mouse event occured in a highlight dialog', () => {
+            sandbox.stub(annotatorUtil, 'findClosestDataType').returns(DATA_TYPE_ANNOTATION_DIALOG);
+            expect(isDialogDataType({})).to.be.true;
+        });
+
+        it('should return false if the mouse event occured outside a highlight dialog', () => {
+            sandbox.stub(annotatorUtil, 'findClosestDataType').returns('something');
+            expect(isDialogDataType({})).to.be.false;
         });
     });
 });
