@@ -231,6 +231,7 @@ class CreateHighlightDialog extends EventEmitter {
      * @return {void}
      */
     onHighlightClick(event) {
+        event.preventDefault();
         event.stopPropagation();
         this.emit(CreateEvents.plain);
     }
@@ -242,6 +243,7 @@ class CreateHighlightDialog extends EventEmitter {
      * @return {void}
      */
     onCommentClick(event) {
+        event.preventDefault();
         event.stopPropagation();
         this.emit(CreateEvents.comment);
 
@@ -261,6 +263,7 @@ class CreateHighlightDialog extends EventEmitter {
     onCommentPost(text) {
         this.emit(CreateEvents.commentPost, text);
         this.commentBox.clear();
+        this.commentBox.blur();
     }
 
     /**
@@ -345,6 +348,7 @@ class CreateHighlightDialog extends EventEmitter {
             this.commentCreateEl.addEventListener('touchstart', this.stopPropagation);
             this.highlightCreateEl.addEventListener('touchend', this.onHighlightClick);
             this.commentCreateEl.addEventListener('touchend', this.onCommentClick);
+            highlightDialogEl.addEventListener('touchend', this.stopPropagation);
         }
 
         // Hide comment box, by default

@@ -112,6 +112,19 @@ class CommentBox extends EventEmitter {
     }
 
     /**
+     * Unfocus the text box.
+     *
+     * @return {void}
+     */
+    blur() {
+        if (!this.containerEl) {
+            return;
+        }
+
+        document.activeElement.blur();
+    }
+
+    /**
      * Clear out the text box.
      *
      * @return {void}

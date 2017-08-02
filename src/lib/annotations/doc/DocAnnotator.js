@@ -497,10 +497,14 @@ class DocAnnotator extends Annotator {
      * @return {void}
      */
     onSelectionChange(event) {
+        // Do nothing if in a text area
+        if (document.activeElement.nodeName.toLowerCase() === 'textarea') {
+            return;
+        }
         // Do nothing if the selection is empty
-        const selection = window.getSelection().toString();
+        const selection = window.getSelection();
         // Bail if mid highlight and tapping on the screen
-        if (!selection) {
+        if (!docAnnotatorUtil.isValidSelection(selection)) {
             this.lastSelection = null;
             this.lastHighlightEvent = null;
             this.createHighlightDialog.hide();
