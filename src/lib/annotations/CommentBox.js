@@ -65,6 +65,9 @@ class CommentBox extends EventEmitter {
      */
     parentEl;
 
+    /** Whether or not we should use touch events */
+    hasTouch;
+
     /* Events that the comment box can emit. */
     static CommentEvents = {
         cancel: 'comment_cancel',
@@ -88,6 +91,7 @@ class CommentBox extends EventEmitter {
         this.cancelText = config.cancel || this.cancelText;
         this.postText = config.post || this.postText;
         this.placeholderText = config.placeholder || this.placeholderText;
+        this.hasTouch = config.hasTouch;
 
         // Explicit scope binding for event listeners
         this.onCancel = this.onCancel.bind(this);
@@ -162,6 +166,10 @@ class CommentBox extends EventEmitter {
         this.containerEl = null;
         this.cancelEl.removeEventListener('click', this.onCancel);
         this.postEl.removeEventListener('click', this.onPost);
+        if (this.hasTouch) {
+            this.cancelEl.removeEventListener('touchstart', this.onCancel);
+            this.postEl.removeEventListener('touchstart', this.onPost);
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -196,9 +204,12 @@ class CommentBox extends EventEmitter {
      * Clear the current text in the textarea element and notify listeners.
      *
      * @private
+     * @param {Event} event Event created by input event
      * @return {void}
      */
-    onCancel() {
+    onCancel(event) {
+        // stops touch propogating to a click event
+        event.preventDefault();
         this.clear();
         this.emit(CommentBox.CommentEvents.cancel);
     }
@@ -207,9 +218,12 @@ class CommentBox extends EventEmitter {
      * Notify listeners of submit event and then clear textarea element.
      *
      * @private
+     * @param {Event} event Event created by input event
      * @return {void}
      */
-    onPost() {
+    onPost(event) {
+        // stops touch propogating to a click event
+        event.preventDefault();
         this.emit(CommentBox.CommentEvents.post, this.textAreaEl.value);
         this.clear();
     }
@@ -232,6 +246,10 @@ class CommentBox extends EventEmitter {
         // Add event listeners
         this.cancelEl.addEventListener('click', this.onCancel);
         this.postEl.addEventListener('click', this.onPost);
+        if (this.hasTouch) {
+            this.cancelEl.addEventListener('touchstart', this.onCancel);
+            this.postEl.addEventListener('touchstart', this.onPost);
+        }
 
         return containerEl;
     }

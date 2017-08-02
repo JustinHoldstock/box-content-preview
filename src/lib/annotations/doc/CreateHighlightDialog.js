@@ -65,6 +65,12 @@ class CreateHighlightDialog extends EventEmitter {
     /** @property {boolean} - Whether or not we're on a mobile device. */
     isMobile;
 
+    /** @property {boolean} - Whether or not we support touch. */
+    hasTouch;
+
+    /** @property {boolean} - Whether or not this is visible. */
+    isVisible;
+
     /**
      * A dialog used to create plain and comment highlights.
      *
@@ -72,13 +78,17 @@ class CreateHighlightDialog extends EventEmitter {
      *
      * @param {HTMLElement} parentEl - Parent element
      * @param {boolean} isMobile - Whether or not this is running on a mobile device
+     * @param {Object} [config] - For configuring the dialog.
+     * @param {boolean} [config.hasTouch] - True to add touch events.
+     * @param {boolean} [config.isMobile] - True if on a mobile device.
      * @return {CreateHighlightDialog} CreateHighlightDialog instance
      */
-    constructor(parentEl, isMobile = false) {
+    constructor(parentEl, config = {}) {
         super();
 
         this.parentEl = parentEl;
-        this.isMobile = isMobile;
+        this.isMobile = config.isMobile || false;
+        this.hasTouch = config.hasTouch || false;
 
         // Explicit scope binding for event listeners
         this.onHighlightClick = this.onHighlightClick.bind(this);
@@ -120,6 +130,7 @@ class CreateHighlightDialog extends EventEmitter {
      * @return {void}
      */
     show(newParentEl) {
+        this.isVisible = true;
         if (!this.containerEl) {
             this.containerEl = this.createElement();
         }
@@ -145,6 +156,7 @@ class CreateHighlightDialog extends EventEmitter {
      * @return {void}
      */
     hide() {
+        this.isVisible = false;
         if (!this.containerEl) {
             return;
         }
@@ -170,7 +182,6 @@ class CreateHighlightDialog extends EventEmitter {
         // Stop interacting with this element from triggering outside actions
         this.containerEl.removeEventListener('click', this.stopPropagation);
         this.containerEl.removeEventListener('mouseup', this.stopPropagation);
-        this.containerEl.removeEventListener('touchend', this.stopPropagation);
         this.containerEl.removeEventListener('dblclick', this.stopPropagation);
 
         // Event listeners
@@ -178,6 +189,12 @@ class CreateHighlightDialog extends EventEmitter {
         this.commentCreateEl.removeEventListener('click', this.onCommentClick);
         this.commentBox.removeListener(CommentBox.CommentEvents.post, this.onCommentPost);
         this.commentBox.removeListener(CommentBox.CommentEvents.cancel, this.onCommentCancel);
+
+        if (this.hasTouch) {
+            this.containerEl.removeEventListener('touchend', this.stopPropagation);
+            this.highlightCreateEl.removeEventListener('touchstart', this.onHighlightClick);
+            this.commentCreateEl.removeEventListener('touchstart', this.onCommentClick);
+        }
 
         this.containerEl.remove();
         this.containerEl = null;
@@ -312,8 +329,6 @@ class CreateHighlightDialog extends EventEmitter {
         // Stop interacting with this element from triggering outside actions
         highlightDialogEl.addEventListener('click', this.stopPropagation);
         highlightDialogEl.addEventListener('mouseup', this.stopPropagation);
-        highlightDialogEl.addEventListener('touchend', this.stopPropagation);
-        highlightDialogEl.addEventListener('touchstart', this.stopPropagation);
         highlightDialogEl.addEventListener('dblclick', this.stopPropagation);
 
         // Event listeners
@@ -321,6 +336,14 @@ class CreateHighlightDialog extends EventEmitter {
         this.commentCreateEl.addEventListener('click', this.onCommentClick);
         this.commentBox.addListener(CommentBox.CommentEvents.post, this.onCommentPost);
         this.commentBox.addListener(CommentBox.CommentEvents.cancel, this.onCommentCancel);
+
+        // touch events
+        if (this.hasTouch) {
+            this.highlightCreateEl.addEventListener('touchstart', this.stopPropagation);
+            this.commentCreateEl.addEventListener('touchstart', this.stopPropagation);
+            this.highlightCreateEl.addEventListener('touchend', this.onHighlightClick);
+            this.commentCreateEl.addEventListener('touchend', this.onCommentClick);
+        }
 
         // Hide comment box, by default
         this.commentBox.hide();

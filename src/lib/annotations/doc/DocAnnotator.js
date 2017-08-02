@@ -32,6 +32,9 @@ const CLASS_RANGY_HIGHLIGHT = 'rangy-highlight';
 const SELECTOR_PREVIEW_DOC = '.bp-doc';
 const CLASS_DEFAULT_CURSOR = 'bp-use-default-cursor';
 
+// Required by rangy highlighter
+const ID_ANNOTATED_ELEMENT = 'bp-rangy-annotated-element';
+
 /**
  * For filtering out and only showing the first thread in a list of threads.
  *
@@ -59,48 +62,27 @@ function isThreadInHoverState(thread) {
 
 @autobind
 class DocAnnotator extends Annotator {
-    /**
-     * For tracking the most recent event fired by mouse move event.
-     *
-     * @property {Event}
-     */
+    /** @property {Event} - For tracking the most recent event fired by mouse move event. */
     mouseMoveEvent;
 
-    /**
-     * Event callback for mouse move events with for highlight annotations.
-     *
-     * @property {Function}
-     */
+    /** @property {Function} - Event callback for mouse move events with for highlight annotations. */
     highlightMousemoveHandler;
 
-    /**
-     * Handle to RAF used to throttle highlight collision checks.
-     *
-     * @property {Function}
-     */
+    /** @property {Function} - Handle to RAF used to throttle highlight collision checks. */
     highlightThrottleHandle;
 
-    /**
-     * Timer used to throttle highlight event process.
-     *
-     * @property {number}
-     */
+    /** @property {number} - Timer used to throttle highlight event process. */
     throttleTimer = 0;
 
-    /**
-     * UI used to create new highlight annotations.
-     *
-     * @property {CreateHighlightDialog}
-     */
+    /** @property {CreateHighlightDialog} - UI used to create new highlight annotations. */
     createHighlightDialog;
 
-    /**
-     * For delaying creation of highlight quad points and dialog. Tracks the
-     * current selection event, made in a previous event.
-     *
-     * @property {Event}
-     */
+    /** @property {Event} - For delaying creation of highlight quad points and dialog. Tracks the
+     * current selection event, made in a previous event. */
     lastHighlightEvent;
+
+    /** @property {Selection} - For tracking diffs in text selection, for mobile highlights creation. */
+    lastSelection;
 
     /**
      * Creates and mananges plain highlight and comment highlight and point annotations
@@ -119,9 +101,11 @@ class DocAnnotator extends Annotator {
         this.createHighlightThread = this.createHighlightThread.bind(this);
         this.createPlainHighlight = this.createPlainHighlight.bind(this);
         this.highlightCreateHandler = this.highlightCreateHandler.bind(this);
-        this.onTouchStart = this.onTouchStart.bind(this);
 
-        this.createHighlightDialog = new CreateHighlightDialog(this.container, this.isMobile);
+        this.createHighlightDialog = new CreateHighlightDialog(this.container, {
+            isMobile: this.isMobile,
+            hasTouch: this.hasTouch
+        });
         this.createHighlightDialog.addListener(CreateEvents.plain, this.createPlainHighlight);
 
         this.createHighlightDialog.addListener(CreateEvents.comment, this.highlightCurrentSelection);
@@ -144,6 +128,13 @@ class DocAnnotator extends Annotator {
         this.createHighlightDialog.removeListener(CreateEvents.commentPost, this.createHighlightThread);
         this.createHighlightDialog.destroy();
         this.createHighlightDialog = null;
+    }
+
+    /** @inheritdoc */
+    init(initialScale) {
+        super.init(initialScale);
+        // Allow rangy to highlight this
+        this.annotatedElement.id = ID_ANNOTATED_ELEMENT;
     }
 
     //--------------------------------------------------------------------------
@@ -347,6 +338,7 @@ class DocAnnotator extends Annotator {
         const annotations = [];
         const thread = this.createAnnotationThread(annotations, location, TYPES.highlight);
         this.lastHighlightEvent = null;
+        this.lastSelection = null;
 
         if (!thread) {
             return null;
@@ -424,9 +416,8 @@ class DocAnnotator extends Annotator {
             this.annotatedElement.addEventListener('mousedown', this.highlightMousedownHandler);
             this.annotatedElement.addEventListener('contextmenu', this.highlightMousedownHandler);
             this.annotatedElement.addEventListener('mousemove', this.getHighlightMouseMoveHandler());
-            if (this.isMobile) {
-                document.addEventListener('selectionchange', this.highlightCreateHandler);
-                document.addEventListener('touchstart', this.onTouchStart);
+            if (this.hasTouch && this.isMobile) {
+                document.addEventListener('selectionchange', this.onSelectionChange);
             }
         }
     }
@@ -446,9 +437,8 @@ class DocAnnotator extends Annotator {
             this.annotatedElement.removeEventListener('mousedown', this.highlightMousedownHandler);
             this.annotatedElement.removeEventListener('contextmenu', this.highlightMousedownHandler);
             this.annotatedElement.removeEventListener('mousemove', this.getHighlightMouseMoveHandler());
-            if (this.isMobile) {
-                document.removeEventListener('selectionchange', this.highlightCreateHandler);
-                document.removeEventListener('touchstart', this.onTouchStart);
+            if (this.hasTouch && this.isMobile) {
+                document.removeEventListener('selectionchange', this.onSelectionChange);
             }
         }
 
@@ -499,6 +489,30 @@ class DocAnnotator extends Annotator {
     //--------------------------------------------------------------------------
     // Private
     //--------------------------------------------------------------------------
+
+    /**
+     * Handles changes in text selection. Used for mobile highlight creation.
+     *
+     * @return {void}
+     */
+    onSelectionChange(event) {
+        // Do nothing if the selection is empty
+        const selection = window.getSelection().toString();
+        // Bail if mid highlight and tapping on the screen
+        if (!selection || this.lastHighlightEvent) {
+            this.lastSelection = null;
+            this.lastHighlightEvent = null;
+            this.createHighlightDialog.hide();
+            return;
+        }
+
+        if (!this.createHighlightDialog.isVisble) {
+            this.createHighlightDialog.show(this.container);
+        }
+
+        this.lastSelection = selection;
+        this.lastHighlightEvent = event;
+    }
 
     /**
      * Highlight the current range of text that has been selected.
@@ -705,19 +719,6 @@ class DocAnnotator extends Annotator {
         } else {
             this.highlightClickHandler(event);
         }
-    }
-
-    /**
-     * Handle touch start event.
-     * 
-     * @return {void}
-     */
-    onTouchStart() {
-        if (this.highlighter) {
-            this.highlighter.removeAllHighlights();
-        }
-
-        this.createHighlightDialog.hide();
     }
 
     /**

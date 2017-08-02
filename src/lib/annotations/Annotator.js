@@ -60,6 +60,7 @@ class Annotator extends EventEmitter {
         this.locale = data.locale;
         this.validationErrorDisplayed = false;
         this.isMobile = data.isMobile;
+        this.hasTouch = data.hasTouch;
         this.previewUI = data.previewUI;
         this.annotationModeHandlers = [];
     }
