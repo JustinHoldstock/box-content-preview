@@ -7,7 +7,7 @@ import * as constants from '../annotationConstants';
 const CLASS_CREATE_DIALOG = 'bp-create-annotation-dialog';
 const TITLE_HIGHLIGHT_TOGGLE = __('annotation_highlight_toggle');
 const TITLE_HIGHLIGHT_COMMENT = __('annotation_highlight_comment');
-const DATA_TYPE_HIGHLIGHT = 'highlight-btn';
+const DATA_TYPE_HIGHLIGHT = 'add-highlight-btn';
 const DATA_TYPE_ADD_HIGHLIGHT_COMMENT = 'add-highlight-comment-btn';
 const CREATE_HIGHLIGHT_DIALOG_TEMPLATE = `
     <div class="${constants.CLASS_ANNOTATION_CARET}" style="left: 50%;"></div>
@@ -15,7 +15,7 @@ const CREATE_HIGHLIGHT_DIALOG_TEMPLATE = `
         <div class="${constants.CLASS_ANNOTATION_HIGHLIGHT_DIALOG}">
             <span class="${constants.CLASS_HIGHLIGHT_BTNS}">
                 <button class="bp-btn-plain ${constants.CLASS_ADD_HIGHLIGHT_BTN}"
-                    data-type="${DATA_TYPE_HIGHLIGHT}""
+                    // data-type="${DATA_TYPE_HIGHLIGHT}""
                     title="${TITLE_HIGHLIGHT_TOGGLE}">
                     ${ICON_HIGHLIGHT}
                 </button>
@@ -230,7 +230,8 @@ class CreateHighlightDialog extends EventEmitter {
      *
      * @return {void}
      */
-    onHighlightClick() {
+    onHighlightClick(event) {
+        event.stopPropagation();
         this.emit(CreateEvents.plain);
     }
 
@@ -240,7 +241,8 @@ class CreateHighlightDialog extends EventEmitter {
      *
      * @return {void}
      */
-    onCommentClick() {
+    onCommentClick(event) {
+        event.stopPropagation();
         this.emit(CreateEvents.comment);
 
         this.commentBox.show();

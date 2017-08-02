@@ -331,6 +331,7 @@ class DocAnnotator extends Annotator {
         this.isCreatingHighlight = false;
 
         const location = this.getLocationFromEvent(this.lastHighlightEvent, TYPES.highlight);
+        this.highlighter.removeAllHighlights();
         if (!location) {
             return null;
         }
@@ -499,7 +500,7 @@ class DocAnnotator extends Annotator {
         // Do nothing if the selection is empty
         const selection = window.getSelection().toString();
         // Bail if mid highlight and tapping on the screen
-        if (!selection || this.lastHighlightEvent) {
+        if (!selection) {
             this.lastSelection = null;
             this.lastHighlightEvent = null;
             this.createHighlightDialog.hide();
