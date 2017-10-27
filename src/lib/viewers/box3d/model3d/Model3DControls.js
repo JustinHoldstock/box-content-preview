@@ -94,7 +94,7 @@ class Model3DControls extends Box3DControls {
             '',
             ICON_GEAR
         );
-        // this.hideExploderToggle();
+        this.hideExploderToggle();
 
         // VR button
         this.addVrButton();

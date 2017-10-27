@@ -47,6 +47,9 @@ class Model3DRenderer extends Box3DRenderer {
     /** A mapping of preview render mode names to Box3D render mode enum values */
     renderModeValues;
 
+    /** A reference to the exploder component */
+    exploderComponent;
+
     /**
      * Creates a 3D runtime and loads in a 3D model for rendering
      *
@@ -178,6 +181,17 @@ class Model3DRenderer extends Box3DRenderer {
         const animations = this.box3d.getAssetsByClass(Box3D.AnimationAsset);
         if (animations.length > 0) {
             this.setAnimationAsset(animations[0]);
+        }
+
+        // If there are enough meshes, attach the exploder component
+        const meshes = this.instance.getDescendantsByType('mesh');
+        if (meshes.length > 1) {
+            // Attach if it doesn't already exist
+            const exploder = this.instance.getComponentByScriptId('exploder');
+            if (!exploder) {
+                const compID = `exploder_${this.instance.id}`;
+                this.exploderComponent = this.instance.addComponent('exploder', {}, compID);
+            }
         }
 
         this.addHelpersToScene();
@@ -346,21 +360,19 @@ class Model3DRenderer extends Box3DRenderer {
      * it hasn't been attached
      *
      * @public
+     * @param {boolean} [contract] - Whether or not to force the meshes back together.
      * @return {void}
      */
-    toggleExploder() {
-        if (!this.instance) {
+    toggleExploder(contract = false) {
+        if (!this.instance || !this.exploderComponent) {
             return;
         }
 
-        const exploder = this.instance.getComponentByScriptId('exploder');
-
-        console.log(this.instance);
-        if (!exploder || this.instance) {
-            return;
+        if (contract) {
+            this.instance.trigger('playContract');
+        } else {
+            this.instance.trigger('toggleExplode');
         }
-
-        exploder.trigger('toggleExplode');
     }
 
     /**

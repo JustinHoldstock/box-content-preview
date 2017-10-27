@@ -183,6 +183,11 @@ class Model3DViewer extends Box3DViewer {
                 // Initialize animation controls when animations are present.
                 this.populateAnimationControls();
 
+                // Show exploder UI if possible
+                if (this.renderer.exploderComponent) {
+                    this.controls.showExploderToggle();
+                }
+
                 this.showWrapper();
 
                 this.emit(EVENT_LOAD);
@@ -293,6 +298,7 @@ class Model3DViewer extends Box3DViewer {
             this.handleRotationAxisSet(this.axes.up, this.axes.forward, false);
             this.renderer.stopAnimation();
             this.renderer.resetView();
+            this.renderer.toggleExploder(true);
         }
     }
 
