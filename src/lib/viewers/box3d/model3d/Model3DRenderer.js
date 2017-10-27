@@ -342,6 +342,28 @@ class Model3DRenderer extends Box3DRenderer {
     }
 
     /**
+     * Expand / contract all mesh parts in a model. Will attach component if
+     * it hasn't been attached
+     *
+     * @public
+     * @return {void}
+     */
+    toggleExploder() {
+        if (!this.instance) {
+            return;
+        }
+
+        const exploder = this.instance.getComponentByScriptId('exploder');
+
+        console.log(this.instance);
+        if (!exploder || this.instance) {
+            return;
+        }
+
+        exploder.trigger('toggleExplode');
+    }
+
+    /**
      * Stop the current animation and reset it to its beginning.
      *
      * @public

@@ -13,6 +13,7 @@ import {
     EVENT_SET_WIREFRAMES_VISIBLE,
     EVENT_SET_GRID_VISIBLE,
     EVENT_TOGGLE_ANIMATION,
+    EVENT_TOGGLE_EXPLODER,
     EVENT_TOGGLE_HELPERS,
     RENDER_MODE_LIT
 } from './model3DConstants';
@@ -74,6 +75,7 @@ class Model3DViewer extends Box3DViewer {
             this.controls.on(EVENT_SET_WIREFRAMES_VISIBLE, this.handleShowWireframes);
             this.controls.on(EVENT_SET_GRID_VISIBLE, this.handleShowGrid);
             this.controls.on(EVENT_TOGGLE_ANIMATION, this.handleToggleAnimation);
+            this.controls.on(EVENT_TOGGLE_EXPLODER, this.handleToggleExploder);
             this.controls.on(EVENT_TOGGLE_HELPERS, this.handleToggleHelpers);
         }
 
@@ -235,13 +237,23 @@ class Model3DViewer extends Box3DViewer {
 
     /**
      * Handle animation playback (play / pause).
-     * @method handleToggleAnimation
+     * 
      * @private
      * @param {boolean} play True to force the animation to play.
      * @return {void}
      */
     handleToggleAnimation(play) {
         this.renderer.toggleAnimation(play);
+    }
+
+    /**
+     * Handle triggering of exploder component.
+     * 
+     * @private
+     * @return {void}
+     */
+    handleToggleExploder() {
+        this.renderer.toggleExploder();
     }
 
     /**

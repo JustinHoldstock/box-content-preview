@@ -12,6 +12,7 @@ import {
     EVENT_SET_WIREFRAMES_VISIBLE,
     EVENT_SET_GRID_VISIBLE,
     EVENT_TOGGLE_ANIMATION,
+    EVENT_TOGGLE_EXPLODER,
     EVENT_TOGGLE_HELPERS,
     RENDER_MODE_LIT
 } from './model3DConstants';
@@ -48,6 +49,9 @@ class Model3DControls extends Box3DControls {
     /** @property {HTMLElement} - Element for toggling open/close of the animationClipsPullup */
     animationClipButtonEl;
 
+    /** @property {HTMLElement} - Element for toggling exploder component */
+    exploderToggleButtonEl;
+
     /**
      * Creates UI and handles events for 3D Model Preview.
      *
@@ -83,6 +87,15 @@ class Model3DControls extends Box3DControls {
         this.animationClipButtonEl.parentNode.appendChild(this.animationClipsPullup.pullupEl);
         this.hideAnimationControls();
 
+        // Exploder component trigger
+        this.exploderToggleButtonEl = this.controls.add(
+            __('box3d_explode_toggle'),
+            this.handleExploderToggle,
+            '',
+            ICON_GEAR
+        );
+        // this.hideExploderToggle();
+
         // VR button
         this.addVrButton();
 
@@ -117,6 +130,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle toggle Settings ui event.
      *
+     * @private
      * @return {void}
      */
     handleToggleSettings() {
@@ -128,6 +142,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle a change of render mode, from the settings panel.
      *
+     * @private
      * @param {string} renderMode - The render mode name to notify listeners of
      * @return {void}
      */
@@ -139,6 +154,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle a change in skeleton visibility.
      *
+     * @private
      * @param {boolean} visible - Indicates whether or not skeletons are visible
      * @return {void}
      */
@@ -149,6 +165,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle a change in wireframe visibility.
      *
+     * @private
      * @param {boolean} visible - Indicates whether or not wireframes are visible
      * @return {void}
      */
@@ -159,6 +176,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle a change in grid visibility.
      *
+     * @private
      * @param {boolean} visible - Indicates whether or not the grid is visible
      * @return {void}
      */
@@ -170,6 +188,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle change of camera projection.
      *
+     * @private
      * @param {string} mode - The projection mode to use
      * @return {void}
      */
@@ -180,6 +199,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Handle rotation on axis.
      *
+     * @private
      * @param {Object} rotation - Rotation axis description with axis and amount (in degrees)
      * @return {void}
      */
@@ -218,6 +238,34 @@ class Model3DControls extends Box3DControls {
     }
 
     /**
+     * Show exploder toggle button.
+     *
+     * @public
+     * @return {void}
+     */
+    showExploderToggle() {
+        if (!this.exploderToggleButtonEl) {
+            return;
+        }
+
+        this.exploderToggleButtonEl.classList.remove(CSS_CLASS_HIDDEN);
+    }
+
+    /**
+     * Hide exploder toggle button.
+     *
+     * @public
+     * @return {void}
+     */
+    hideExploderToggle() {
+        if (!this.exploderToggleButtonEl) {
+            return;
+        }
+
+        this.exploderToggleButtonEl.classList.add(CSS_CLASS_HIDDEN);
+    }
+
+    /**
      * Handle animation clip selection.
      *
      * @private
@@ -227,6 +275,16 @@ class Model3DControls extends Box3DControls {
     handleSelectAnimationClip(clipId) {
         this.setAnimationPlaying(false);
         this.emit(EVENT_SELECT_ANIMATION_CLIP, clipId);
+    }
+
+    /**
+     * Handle exploder toggle button selected.
+     * 
+     * @private
+     * @return {void}
+     */
+    handleExploderToggle() {
+        this.emit(EVENT_TOGGLE_EXPLODER);
     }
 
     /**
@@ -297,6 +355,7 @@ class Model3DControls extends Box3DControls {
     /**
      * Set the current projection mode being used by the settings pullup.
      *
+     * @public
      * @param {string} mode - The projection mode to set on the pullup
      * @return {void}
      */
