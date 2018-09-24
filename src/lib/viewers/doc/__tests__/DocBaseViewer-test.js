@@ -922,6 +922,29 @@ describe('src/lib/viewers/doc/DocBaseViewer', () => {
             });
         });
 
+        it('should append encoding query parameter for gzip content when range requests are disabled', () => {
+            // en-US allows for disabled range requests
+            docBase.options.location = {
+                locale: 'en-US'
+            };
+            const defaultChunkSize = 1048576; // Taken from RANGE_REQUEST_CHUNK_SIZE_US
+            const url = 'www.myTestPDF.com/123456';
+            const paramsList = 'encoding=gzip';
+            const isDisabled = PDFJS.disableRange;
+            sandbox.stub(Browser, 'isIOS').returns(false);
+            sandbox.stub(PDFJS, 'getDocument').returns(Promise.resolve({}));
+            PDFJS.disableRange = true;
+            return docBase.initViewer(url).then(() => {
+                expect(PDFJS.getDocument).to.be.calledWith({
+                    url: `${url}?${paramsList}`,
+                    rangeChunkSize: defaultChunkSize
+                });
+
+                // Reset to original value
+                PDFJS.disableRange = isDisabled;
+            });
+        });
+
         it('should resolve the loading task and set the document/viewer', () => {
             const doc = {
                 url: 'url'
