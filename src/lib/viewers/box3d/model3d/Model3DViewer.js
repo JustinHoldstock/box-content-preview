@@ -51,6 +51,7 @@ class Model3DViewer extends Box3DViewer {
         this.handleToggleAnimation = this.handleToggleAnimation.bind(this);
         this.handleToggleHelpers = this.handleToggleHelpers.bind(this);
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
+        this.handleAssetAndRepLoad = this.handleAssetAndRepLoad.bind(this);
 
         this.onMetadataError = this.onMetadataError.bind(this);
     }
@@ -202,7 +203,8 @@ class Model3DViewer extends Box3DViewer {
                 this.emit(EVENT_LOAD);
 
                 return true;
-            });
+            })
+            .then(this.handleAssetAndRepLoad);
     }
 
     /**
